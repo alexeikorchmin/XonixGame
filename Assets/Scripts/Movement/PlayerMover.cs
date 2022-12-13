@@ -8,22 +8,22 @@ public class PlayerMover : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            gameField.MovePlayer(Vector3Int.down);
+            gameField.MovePlayer(new Position(0, -1));
         }
         
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            gameField.MovePlayer(Vector3Int.up);
+            gameField.MovePlayer(new Position(0, 1));
         }
         
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            gameField.MovePlayer(Vector3Int.left);
+            gameField.MovePlayer(new Position(-1, 0));
         }
         
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            gameField.MovePlayer(Vector3Int.right);
+            gameField.MovePlayer(new Position(1, 0));
         }
     }
 }

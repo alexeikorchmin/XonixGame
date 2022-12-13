@@ -13,11 +13,11 @@ public class TilesGenerator : MonoBehaviour
     
     public void SetGameFieldSize()
     {
-        var topLeftCorner = boundConverter.GetTopLeftCornerPosition();
-        var bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
+        Vector3Int topLeftCorner = boundConverter.GetTopLeftCornerPosition();
+        Vector3Int bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
         
-        var x = Mathf.Abs(topLeftCorner.x) + Mathf.Abs(bottomRightCorner.x);
-        var y = Mathf.Abs(topLeftCorner.y) + Mathf.Abs(bottomRightCorner.y);
+        int x = Mathf.Abs(topLeftCorner.x) + Mathf.Abs(bottomRightCorner.x);
+        int y = Mathf.Abs(topLeftCorner.y) + Mathf.Abs(bottomRightCorner.y);
 
         gameField.SetGameFieldSize(x, y);
     }
@@ -27,9 +27,9 @@ public class TilesGenerator : MonoBehaviour
         var topLeftCorner = boundConverter.GetTopLeftCornerPosition();
         var bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
         
-        for (var x = topLeftCorner.x; x < bottomRightCorner.x; x++)
+        for (int x = topLeftCorner.x; x < bottomRightCorner.x; x++)
         {
-            for (var y = bottomRightCorner.y; y < topLeftCorner.y; y++)
+            for (int y = bottomRightCorner.y; y < topLeftCorner.y; y++)
             {
                 tilemap.SetTile(new Vector3Int(x, y, 0), groundTile);
                 gameField.SetGameFieldData(Items.Ground, x, y);
@@ -39,21 +39,26 @@ public class TilesGenerator : MonoBehaviour
     
     public void GenerateWater()
     {
-        var topLeftCorner = boundConverter.GetTopLeftCornerPosition();
-        var bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
+        Vector3Int topLeftCorner = boundConverter.GetTopLeftCornerPosition();
+        Vector3Int bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
 
         topLeftCorner.x += startGroundSize;
         topLeftCorner.y -= startGroundSize;
         bottomRightCorner.x -= startGroundSize;
         bottomRightCorner.y += startGroundSize;
         
-        for (var x = topLeftCorner.x; x < bottomRightCorner.x; x++)
+        for (int x = topLeftCorner.x; x < bottomRightCorner.x; x++)
         {
-            for (var y = bottomRightCorner.y; y < topLeftCorner.y; y++)
+            for (int y = bottomRightCorner.y; y < topLeftCorner.y; y++)
             {
                 tilemap.SetTile(new Vector3Int(x, y, 0), waterTile);
                 gameField.SetGameFieldData(Items.Water, x, y);
             }
         }
+
+        int x2 = Mathf.Abs(topLeftCorner.x) + Mathf.Abs(bottomRightCorner.x);
+        int y2 = Mathf.Abs(topLeftCorner.y) + Mathf.Abs(bottomRightCorner.y);
+
+        gameField.SetTotalCells(x2, y2, startGroundSize);
     }
 }

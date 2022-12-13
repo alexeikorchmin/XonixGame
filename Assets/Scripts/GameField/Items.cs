@@ -1,8 +1,8 @@
 public enum Items 
 {
     Ground,
-    Water,
     Player,
     Enemy,
-    Tail
+    Tail,
+    Water,
 }

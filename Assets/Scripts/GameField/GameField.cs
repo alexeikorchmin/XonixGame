@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -13,22 +12,22 @@ public class GameField : SerializedMonoBehaviour
 
     private int width;
     private int height;
+    private int totalCells;
+    private int groundCells;
 
     private int xOffset;
     private int yOffset;
 
-    private Vector3Int playerPosition;
-    private Vector3Int enemyPosition;
+    private Position playerPosition;
+    private Position enemyPosition;
 
     private Items nextItem;
     private bool isCutting;
     private bool needCut;
 
-    private int startCountX;
-    private int endCountX;
-    private int startCountY;
-    private int endCountY;
-    private bool canCountCells = true;
+    private HashSet<Position> tailCellsPositionsList = new HashSet<Position>();
+    private List<HashSet<Position>> listAreas = new List<HashSet<Position>>();
+    private Coroutine moveRoutine;
 
     public void SetGameFieldSize(int x, int y)
     {
@@ -46,102 +45,89 @@ public class GameField : SerializedMonoBehaviour
         gameField[x + xOffset, y + yOffset] = (int)item;
     }
 
-    public void SetPlayerPosition(Vector3Int position)
+    public void SetTotalCells(int x, int y, int groundCellsCount)
     {
-        playerPosition = new Vector3Int(position.x, position.y, 0);
-        gameField[position.x, position.y] = (int)Items.Player;
-        tilemap.SetTile(GetPosition(position), tilesDict[Items.Player]);
+        totalCells = x * y;
+        groundCells = groundCellsCount;
     }
 
-    public void SetEnemyPosition(Vector3Int position)
+    public void SetPlayerPosition(Position position)
     {
-        enemyPosition = new Vector3Int(position.x, position.y, 0);
-        gameField[position.x, position.y] = (int)Items.Enemy;
-        tilemap.SetTile(GetPosition(position), tilesDict[Items.Enemy]);
+        playerPosition = new Position(position.x, position.y);
+        SetGamefieldAndTilesData(position, Items.Player);
     }
 
-    public void MovePlayer(Vector3Int direction)
+    public void SetEnemyPosition(Position position)
     {
-        StopAllCoroutines();
-        StartCoroutine(MoveRoutine(direction));
+        enemyPosition = new Position(position.x, position.y);
+        SetGamefieldAndTilesData(position, Items.Enemy);
     }
 
-    private Vector3Int GetPosition(Vector3Int position)
+    public void MovePlayer(Position direction)
+    {
+        //StopAllCoroutines();
+        //StartCoroutine(NewPlayerMove(direction));
+        PlayerMovement(direction);
+    }
+
+    private Vector3Int GetPosition(Position position)
     {
         return new Vector3Int(position.x - xOffset, position.y - yOffset, 0);
     }
 
-    private void SetGamefieldAndTilesData(Vector3Int position, Items item)
+    private void SetGamefieldAndTilesData(Position position, Items item)
     {
         gameField[position.x, position.y] = (int)item;
         tilemap.SetTile(GetPosition(position), tilesDict[item]);
     }
 
-    private IEnumerator MoveRoutine(Vector3Int direction)
+    private void PlayerMovement(Position direction)
     {
-        while (CanMove(direction))
+        if (CanMove(direction) == false) return;
+
+        if (needCut)
         {
-            if (needCut)
-            {
-                Debug.Log("Cut Field");
-
-                Debug.Log($"startCountX = {startCountX}, startCountY = {startCountY}");
-                Debug.Log($"endCountX = {endCountX}, endCountY = {endCountY}");
-
-                CutTheField();
-                needCut = false;
-                break;
-            }
-
-            nextItem = (Items)gameField[playerPosition.x + direction.x, playerPosition.y + direction.y];
-            if (nextItem == Items.Water)
-            {
-                isCutting = true;
-                SetGamefieldAndTilesData(playerPosition, Items.Tail);
-
-                if (canCountCells)
-                {
-                    startCountX = playerPosition.x - xOffset;
-                    startCountY = playerPosition.y - yOffset;
-                    //Debug.Log($"Water: startCountX = {startCountX}, startCountY = {startCountY}");
-                    canCountCells = false;
-                }
-            }
-
-            if (isCutting && nextItem == Items.Ground)
-            {
-                isCutting = false;
-                needCut = true;
-
-                endCountX = playerPosition.x - xOffset;
-                endCountY = playerPosition.y - yOffset;
-                //Debug.Log($"Ground: endCountX = {endCountX}, endCountY = {endCountY}");
-                canCountCells = true;
-            }
-
-            if (!isCutting && nextItem == Items.Ground)
-            {
-                SetGamefieldAndTilesData(playerPosition, Items.Ground);
-            }
-
-            if (nextItem == Items.Tail)
-            {
-                Debug.Log("You Died");
-                break;
-            }
-
-            Vector3Int newPlayerPosition = new Vector3Int(playerPosition.x + direction.x, playerPosition.y + direction.y);
-            SetGamefieldAndTilesData(newPlayerPosition, Items.Player);
-
-            playerPosition += direction;
-
-            yield return new WaitForSeconds(0.015f);
+            needCut = false;
+            return;
         }
 
-        StopAllCoroutines();
+        if (isCutting)
+        {
+            SetGamefieldAndTilesData(playerPosition, Items.Tail);
+            tailCellsPositionsList.Add(playerPosition);
+        }
+        else
+        {
+            SetGamefieldAndTilesData(playerPosition, Items.Ground);
+        }
+
+        nextItem = (Items)gameField[playerPosition.x + direction.x, playerPosition.y + direction.y];
+
+        if (nextItem == Items.Tail)
+        {
+            Debug.Log("You Died");
+        }
+
+        if (nextItem == Items.Water)
+        {
+            isCutting = true;
+        }
+
+        if (isCutting && nextItem == Items.Ground)
+        {
+            isCutting = false;
+            needCut = true;
+            CalculateAreas();
+            CutArea();
+        }
+
+        Position newPlayerPosition = new Position(playerPosition.x + direction.x, playerPosition.y + direction.y);
+        SetGamefieldAndTilesData(newPlayerPosition, Items.Player);
+
+        playerPosition += direction;
     }
 
-    private bool CanMove(Vector3Int direction)
+    private bool CanMove(Position direction)
     {
         return playerPosition.x + direction.x >= 0 &&
                playerPosition.x + direction.x < width &&
@@ -149,66 +135,88 @@ public class GameField : SerializedMonoBehaviour
                playerPosition.y + direction.y < height;
     }
 
-    private void CutTheField()
+    private void CutArea()
     {
-        int newStartCountX;
-        int newStartCountY;
+        int cellsCount = 0;
+        int minCount = totalCells;
+        int indexMinHashSet = 0;
 
-        if (startCountX == endCountX)
+        for (int i = 0; i < listAreas.Count; i++)
         {
-            if (endCountX < width / 2)
+            if (listAreas[i].Count < minCount)
             {
-                endCountX = gameField.GetLowerBound(1);
+                minCount = listAreas[i].Count;
+                indexMinHashSet = i;
             }
-            else
-            {
-                endCountX = gameField.GetUpperBound(1);
-            }
-        }
-        else if (startCountX > endCountX)
-        {
-            newStartCountX = endCountX;
-            endCountX = startCountX;
-            startCountX = newStartCountX;
         }
 
-        if (startCountY == endCountY)
+        foreach (var pos in listAreas[indexMinHashSet])
         {
-            if (endCountY < height / 2)
-            {
-                endCountY = gameField.GetLowerBound(2) - yOffset;
-            }
-            else
-            {
-                endCountY = gameField.GetUpperBound(2) - yOffset;
-            }
-        }
-        else if (startCountY > endCountY)
-        {
-            newStartCountY = endCountY;
-            endCountY = startCountY;
-            startCountY = newStartCountY;
+            SetGamefieldAndTilesData(pos, Items.Ground);
+            cellsCount++;
         }
 
-        for (int i = startCountX; i <= endCountX; i++)
+        foreach (var pos in tailCellsPositionsList)
         {
-            for (int j = startCountY; j <= endCountY; j++)
+            SetGamefieldAndTilesData(pos, Items.Ground);
+            cellsCount++;
+        }
+
+        listAreas.Clear();
+        tailCellsPositionsList.Clear();
+    }
+
+    private bool ContainsThePosition(Position pos)
+    {
+        foreach (var position in listAreas)
+        {
+            if (position.Contains(pos))
+                return true;
+        }
+
+        return false;
+    }
+
+    private void CalculateAreas()
+    {
+        listAreas.Clear();
+
+        for (int i = groundCells; i < width - groundCells; i++)
+        {
+            for (int j = groundCells; j < height - groundCells; j++)
             {
-                SetGamefieldAndTilesData(new Vector3Int(i, j), Items.Ground);
+                if (gameField[i, j] != (int)Items.Water)
+                    continue;
+
+                if (ContainsThePosition(new Position(i, j)) == false)
+                {
+                    var newArea = new HashSet<Position>();
+                    listAreas.Add(newArea);
+                    ExploreArea(newArea, new Position(i, j));
+                }
             }
         }
     }
 
-    private bool CutArray()
+    private void ExploreArea(HashSet<Position> hashSet, Position startPoint)
     {
-        foreach (var cell in gameField)
+        if (hashSet.Contains(startPoint) ||
+            gameField[startPoint.x, startPoint.y] == (int)Items.Ground ||
+            gameField[startPoint.x, startPoint.y] == (int)Items.Player ||
+            gameField[startPoint.x, startPoint.y] == (int)Items.Tail)
         {
-            if (cell == (int)Items.Water)
-            {
-                return false;
-            }
+            return;
         }
 
-        return true;
+        if (gameField[startPoint.x, startPoint.y] == (int)Items.Water ||
+            gameField[startPoint.x, startPoint.y] == (int)Items.Enemy)
+        {
+            hashSet.Add(startPoint);
+        }
+
+        ExploreArea(hashSet, startPoint + new Position(0, 1));
+        ExploreArea(hashSet, startPoint + new Position(0, -1));
+        ExploreArea(hashSet, startPoint + new Position(1, 0));
+        ExploreArea(hashSet, startPoint + new Position(-1, 0));
     }
 }

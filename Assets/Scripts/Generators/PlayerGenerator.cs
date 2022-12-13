@@ -8,12 +8,12 @@ public class PlayerGenerator : MonoBehaviour
 
     public void GeneratePlayer()
     {
-        var topLeftCorner = boundConverter.GetTopLeftCornerPosition();
-        var bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
+        Vector3Int topLeftCorner = boundConverter.GetTopLeftCornerPosition();
+        Vector3Int bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
         
-        var x = Mathf.Abs(topLeftCorner.x) + Mathf.Abs(bottomRightCorner.x);
-        var y = Mathf.Abs(topLeftCorner.y) + Mathf.Abs(bottomRightCorner.y);
+        int x = Mathf.Abs(topLeftCorner.x) + Mathf.Abs(bottomRightCorner.x);
+        int y = Mathf.Abs(topLeftCorner.y) + Mathf.Abs(bottomRightCorner.y);
         
-        gameField.SetPlayerPosition( new Vector3Int(x / 2, y - yOffset, 0));
+        gameField.SetPlayerPosition(new Position(x / 2, y - yOffset));
     }
 }

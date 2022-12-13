@@ -736,10 +736,10 @@ MonoBehaviour:
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: 102908e861913c647ae9415c71d71698, type: 2}
+    - {fileID: 11400000, guid: ecc0a4766b626524b96b72eed69da9ee, type: 2}
+    - {fileID: 11400000, guid: cb3c1263c8f547f4da6f9e32fd609935, type: 2}
     - {fileID: 11400000, guid: a9bb77be06051954e9143934775c533b, type: 2}
     - {fileID: 11400000, guid: ebbd4807c9b8d5241aa0b9f9a50af573, type: 2}
-    - {fileID: 11400000, guid: cb3c1263c8f547f4da6f9e32fd609935, type: 2}
-    - {fileID: 11400000, guid: ecc0a4766b626524b96b72eed69da9ee, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
