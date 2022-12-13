@@ -26,7 +26,6 @@ public class GameField : SerializedMonoBehaviour
 
     private Position playerStartPosition;
     private Position playerPosition;
-    private Position enemyPosition;
 
     private Items nextItem;
     private bool isCutting;
@@ -36,6 +35,16 @@ public class GameField : SerializedMonoBehaviour
     private HashSet<Position> tailCellsPositionsList = new HashSet<Position>();
     private List<HashSet<Position>> listAreas = new List<HashSet<Position>>();
     private Coroutine moveRoutine;
+
+    private List<Enemy> enemies = new List<Enemy>();
+
+    private readonly Position[] moveDirection = new[]{
+            new Position(1, 1),
+            new Position(-1, 1),
+            new Position(-1, -1),
+            new Position(1, -1) };
+
+    public int GetBorderWidth() => groundCells;
 
     public void SetGameFieldSize(int x, int y)
     {
@@ -68,7 +77,9 @@ public class GameField : SerializedMonoBehaviour
 
         listAreas.Clear();
         tailCellsPositionsList.Clear();
+        enemies.Clear();
         StopAllCoroutines();
+        StartCoroutine(MoveEnemyRoutine());
     }
 
     public void SetPlayerPosition(Position position)
@@ -80,7 +91,7 @@ public class GameField : SerializedMonoBehaviour
 
     public void SetEnemyPosition(Position position)
     {
-        enemyPosition = new Position(position.x, position.y);
+        enemies.Add(new Enemy(position, Random.Range(0, moveDirection.Length)));
         SetGamefieldAndTilesData(position, Items.Enemy);
     }
 
@@ -90,7 +101,6 @@ public class GameField : SerializedMonoBehaviour
             StopCoroutine(moveRoutine);
         
         moveRoutine = StartCoroutine(MoveRoutine(direction));
-        //PlayerMovement(direction);
     }
 
     private Vector3Int GetPosition(Position position)
@@ -158,51 +168,6 @@ public class GameField : SerializedMonoBehaviour
 
         if (moveRoutine != null)
             StopCoroutine(moveRoutine);
-    }
-
-    private void PlayerMovement(Position direction)
-    {
-        if (CanMove(direction) == false) return;
-
-        if (needCut)
-        {
-            needCut = false;
-            return;
-        }
-
-        if (isCutting)
-        {
-            SetGamefieldAndTilesData(playerPosition, Items.Tail);
-            tailCellsPositionsList.Add(playerPosition);
-        }
-        else
-        {
-            SetGamefieldAndTilesData(playerPosition, Items.Ground);
-        }
-
-        nextItem = (Items)gameField[playerPosition.x + direction.x, playerPosition.y + direction.y];
-
-        if (nextItem == Items.Tail)
-        {
-            Debug.Log("You Died");
-        }
-
-        if (nextItem == Items.Water)
-        {
-            isCutting = true;
-        }
-
-        if (isCutting && nextItem == Items.Ground)
-        {
-            isCutting = false;
-            needCut = true;
-            CalculateAreas();
-            CutArea();
-        }
-
-        Position newPlayerPosition = new Position(playerPosition.x + direction.x, playerPosition.y + direction.y);
-        SetGamefieldAndTilesData(newPlayerPosition, Items.Player);
-        playerPosition += direction;
     }
 
     private bool CanMove(Position direction)
@@ -314,6 +279,124 @@ public class GameField : SerializedMonoBehaviour
         ExploreArea(hashSet, startPoint + new Position(0, -1));
         ExploreArea(hashSet, startPoint + new Position(1, 0));
         ExploreArea(hashSet, startPoint + new Position(-1, 0));
+    }
+
+    private void MoveEnemies()
+    {
+        foreach (var enemy in enemies)
+        {
+            MoveEnemy(enemy);
+        }
+    }
+
+    private void MoveEnemy(Enemy enemy)
+    {
+        int dir = enemy.DirectionIndex;
+        Position pos = enemy.Position;
+        Position newPosition;
+
+        if (pos.x + moveDirection[dir].x == width - 1 + groundCells || pos.x + moveDirection[dir].x == 0 + groundCells ||
+            pos.y + moveDirection[dir].y == height - 1 + groundCells || pos.y + moveDirection[dir].y == 0 + groundCells ||
+            gameField[pos.x + moveDirection[dir].x, pos.y + moveDirection[dir].y] == (int)Items.Enemy)
+        {
+            ChangeDirection(enemy);
+        }
+
+        if (gameField[pos.x + moveDirection[dir].x, pos.y + moveDirection[dir].y] == (int)Items.Tail ||
+            gameField[pos.x + moveDirection[dir].x, pos.y + moveDirection[dir].y] == (int)Items.Player && isCutting)
+        {
+            if (moveRoutine != null)
+                StopCoroutine(moveRoutine);
+
+            DecreaseLife();
+        }
+
+        int x = pos.x + moveDirection[enemy.DirectionIndex].x;
+        int y = pos.y + moveDirection[enemy.DirectionIndex].y;
+
+        newPosition = new Position(x, y);
+
+        SetGamefieldAndTilesData(newPosition, Items.Enemy);
+        SetGamefieldAndTilesData(pos, Items.Water);
+
+        enemy.Position = newPosition;
+    }
+
+    private void ChangeDirection(Enemy enemy)
+    {
+        int index = enemy.DirectionIndex;
+
+        var pos = enemy.Position;
+
+        if (index == 0)
+        {
+            if (gameField[pos.x + moveDirection[1].x, pos.y + moveDirection[1].y] == (int)Items.Water)
+            {
+                enemy.DirectionIndex = 1;
+            }
+            else if (gameField[pos.x + moveDirection[3].x, pos.y + moveDirection[3].y] == (int)Items.Water)
+            {
+                enemy.DirectionIndex = 3;
+            }
+            else
+            {
+                enemy.DirectionIndex = 2;
+            }
+        }
+        else if (index == 1)
+        {
+            if (gameField[pos.x + moveDirection[2].x, pos.y + moveDirection[2].y] == (int)Items.Water)
+            {
+                enemy.DirectionIndex = 2;
+            }
+            else if (gameField[pos.x + moveDirection[0].x, pos.y + moveDirection[0].y] == (int)Items.Water)
+            {
+                enemy.DirectionIndex = 0;
+            }
+            else
+            {
+                enemy.DirectionIndex = 3;
+            }
+        }
+        else if (index == 2)
+        {
+            if (gameField[pos.x + moveDirection[1].x, pos.y + moveDirection[1].y] == (int)Items.Water)
+            {
+                enemy.DirectionIndex = 1;
+            }
+            else if (gameField[pos.x + moveDirection[3].x, pos.y + moveDirection[3].y] == (int)Items.Water)
+            {
+                enemy.DirectionIndex = 3;
+            }
+            else
+            {
+                enemy.DirectionIndex = 0;
+            }
+        }
+        else
+        {
+            if (gameField[pos.x + moveDirection[0].x, pos.y + moveDirection[0].y] == (int)Items.Water)
+            {
+                enemy.DirectionIndex = 0;
+            }
+            else if (gameField[pos.x + moveDirection[2].x, pos.y + moveDirection[2].y] == (int)Items.Water)
+            {
+                enemy.DirectionIndex = 2;
+            }
+            else
+            {
+                enemy.DirectionIndex = 1;
+            }
+        }
+    }
+
+    private IEnumerator MoveEnemyRoutine()
+    {
+        while (true)
+        {
+            MoveEnemies();
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     private void DecreaseLife()

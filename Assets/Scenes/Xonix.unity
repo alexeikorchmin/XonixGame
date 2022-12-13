@@ -2372,6 +2372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameField: {fileID: 1775470725}
   boundConverter: {fileID: 1155616016}
+  enemiesCount: 2
 --- !u!1 &2145879710
 GameObject:
   m_ObjectHideFlags: 0
