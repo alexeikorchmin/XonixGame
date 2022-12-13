@@ -5,6 +5,9 @@ using TMPro;
 
 public class ManagerUI : MonoBehaviour
 {
+    [SerializeField] private GeneratorManager generatorManager;
+    [SerializeField] private PlayerMover playerMover;
+
     [SerializeField] private TMP_Text lifeText;
     [SerializeField] private TMP_Text fieldPercentsText;
     [SerializeField] private GameObject gameOverPanel;
@@ -40,7 +43,9 @@ public class ManagerUI : MonoBehaviour
 
     private void StartGame(int lives)
     {
+        generatorManager.Init(lives);
         gameOverPanel.SetActive(false);
         winPanel.SetActive(false);
+        playerMover.SetPlayerMoveState(true);
     }
 }

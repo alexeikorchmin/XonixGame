@@ -569,14 +569,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c52820aa527d6c4f841ff2e59e3bd3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemiesGenerator: {fileID: 0}
+  generatorManager: {fileID: 2144798299}
   playerMover: {fileID: 838865192}
-  lifeText: {fileID: 0}
-  fieldPercentsText: {fileID: 0}
-  gameOverPanel: {fileID: 0}
-  winPanel: {fileID: 0}
-  playAgainButton: {fileID: 0}
-  nextLevelButton: {fileID: 0}
+  lifeText: {fileID: 769635674}
+  fieldPercentsText: {fileID: 1064998427}
+  gameOverPanel: {fileID: 485887650}
+  winPanel: {fileID: 442629212}
+  playAgainButton: {fileID: 1097493423}
+  nextLevelButton: {fileID: 1087335097}
 --- !u!1 &414335910
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,7 +1005,7 @@ GameObject:
   - component: {fileID: 769635675}
   - component: {fileID: 769635674}
   m_Layer: 0
-  m_Name: Life
+  m_Name: LifeTMPro
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1173,6 +1173,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameField: {fileID: 1775470725}
+  isMoveActive: 0
 --- !u!1 &1064998425
 GameObject:
   m_ObjectHideFlags: 0
@@ -1185,7 +1186,7 @@ GameObject:
   - component: {fileID: 1064998428}
   - component: {fileID: 1064998427}
   m_Layer: 0
-  m_Name: Percents
+  m_Name: PercentsTMPro
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1321,7 +1322,7 @@ GameObject:
   - component: {fileID: 1087335098}
   - component: {fileID: 1087335097}
   m_Layer: 0
-  m_Name: Button
+  m_Name: NextLvlButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1443,7 +1444,7 @@ GameObject:
   - component: {fileID: 1097493424}
   - component: {fileID: 1097493423}
   m_Layer: 0
-  m_Name: Button
+  m_Name: AgainButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1828,7 +1829,11 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  managerUI: {fileID: 409577287}
+  playerMover: {fileID: 838865192}
   tilemap: {fileID: 414335913}
+  targetPercents: 80
+  life: 3
 --- !u!1 &1849791464
 GameObject:
   m_ObjectHideFlags: 0
@@ -2351,6 +2356,8 @@ MonoBehaviour:
   tilesGenerator: {fileID: 2144798297}
   playerGenerator: {fileID: 2144798298}
   enemiesGenerator: {fileID: 2144798300}
+  gameField: {fileID: 1775470725}
+  playerMover: {fileID: 838865192}
 --- !u!114 &2144798300
 MonoBehaviour:
   m_ObjectHideFlags: 0
