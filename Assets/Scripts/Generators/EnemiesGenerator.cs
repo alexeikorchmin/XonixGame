@@ -10,15 +10,8 @@ public class EnemiesGenerator : MonoBehaviour
     private int x;
     private int y;
 
-    public void ResetEnemiesCount()
-    {
-        enemiesCount = 0;
-    }
-
     public void GenerateEnemy()
     {
-        border = gameField.GetBorderWidth();
-            
         Vector3Int topLeftCorner = boundConverter.GetTopLeftCornerPosition();
         Vector3Int bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
         
@@ -27,9 +20,12 @@ public class EnemiesGenerator : MonoBehaviour
         
         for (var i = 0; i < enemiesCount; i++)
         {
-            gameField.SetEnemyPosition(new Position(Random.Range(border + 1, x - border - 1), Random.Range(border + 1, y - border - 1)));
+            gameField.SetEnemyPosition(new Position(Random.Range(border + 5, x - border - 5), Random.Range(border + 5, y - border - 5)));
         }
+    }
 
-        enemiesCount++;
+    private void Start()
+    {
+        border = gameField.GetBorderWidth();
     }
 }

@@ -34,7 +34,7 @@ public class GameField : SerializedMonoBehaviour
 
     private HashSet<Position> tailCellsPositionsList = new HashSet<Position>();
     private List<HashSet<Position>> listAreas = new List<HashSet<Position>>();
-    private Coroutine moveRoutine;
+    private Coroutine movePlayerRoutine;
 
     private List<Enemy> enemies = new List<Enemy>();
 
@@ -59,6 +59,16 @@ public class GameField : SerializedMonoBehaviour
 
     public void SetGameFieldData(Items item, int x, int y)
     {
+        if (x + xOffset < 0)
+        {
+            xOffset = Mathf.Abs(x);
+        }
+
+        if (y + yOffset < 0)
+        {
+            yOffset = Mathf.Abs(y);
+        }
+
         gameField[x + xOffset, y + yOffset] = (int)item;
     }
 
@@ -66,6 +76,20 @@ public class GameField : SerializedMonoBehaviour
     {
         totalCells = x * y;
         groundCells = groundCellsCount;
+    }
+
+    public void SetPlayerPosition(Position position)
+    {
+        playerStartPosition = new Position(position.x, position.y);
+        playerPosition = new Position(position.x, position.y);
+        SetGamefieldAndTilesData(position, Items.Player);
+    }
+
+    public void SetEnemyPosition(Position position)
+    {
+        Enemy enemy = new Enemy(position, Random.Range(0, moveDirection.Length));
+        enemies.Add(enemy);
+        SetGamefieldAndTilesData(position, Items.Enemy);
     }
 
     public void Init(int lives)
@@ -82,25 +106,12 @@ public class GameField : SerializedMonoBehaviour
         StartCoroutine(MoveEnemyRoutine());
     }
 
-    public void SetPlayerPosition(Position position)
-    {
-        playerStartPosition = new Position(position.x, position.y);
-        playerPosition = new Position(position.x, position.y);
-        SetGamefieldAndTilesData(position, Items.Player);
-    }
-
-    public void SetEnemyPosition(Position position)
-    {
-        enemies.Add(new Enemy(position, Random.Range(0, moveDirection.Length)));
-        SetGamefieldAndTilesData(position, Items.Enemy);
-    }
-
     public void MovePlayer(Position direction)
     {
-        if (moveRoutine != null)
-            StopCoroutine(moveRoutine);
-        
-        moveRoutine = StartCoroutine(MoveRoutine(direction));
+        if (movePlayerRoutine != null)
+            StopCoroutine(movePlayerRoutine);
+
+        movePlayerRoutine = StartCoroutine(MovePlayerRoutine(direction));
     }
 
     private Vector3Int GetPosition(Position position)
@@ -114,7 +125,7 @@ public class GameField : SerializedMonoBehaviour
         tilemap.SetTile(GetPosition(position), tilesDict[item]);
     }
 
-    private IEnumerator MoveRoutine(Position direction)
+    private IEnumerator MovePlayerRoutine(Position direction)
     {
         isLosingLife = false;
 
@@ -166,8 +177,8 @@ public class GameField : SerializedMonoBehaviour
             yield return new WaitForSeconds(0.015f);
         }
 
-        if (moveRoutine != null)
-            StopCoroutine(moveRoutine);
+        if (movePlayerRoutine != null)
+            StopCoroutine(movePlayerRoutine);
     }
 
     private bool CanMove(Position direction)
@@ -212,6 +223,7 @@ public class GameField : SerializedMonoBehaviour
 
         foreach (var pos in listAreas[indexMinHashSet])
         {
+            FindEnemyByPosition(pos);
             SetGamefieldAndTilesData(pos, Items.Ground);
             cellsCount++;
         }
@@ -225,6 +237,19 @@ public class GameField : SerializedMonoBehaviour
         CountPercents(cellsCount);
         listAreas.Clear();
         tailCellsPositionsList.Clear();
+    }
+
+    private void FindEnemyByPosition(Position posit)
+    {
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            if (enemies[i].Position == posit)
+            {
+                StopCoroutine(MoveEnemyRoutine());
+                enemies.RemoveAt(i);
+                StartCoroutine(MoveEnemyRoutine());
+            }
+        }
     }
 
     private bool ContainsThePosition(Position pos)
@@ -295,8 +320,7 @@ public class GameField : SerializedMonoBehaviour
         Position pos = enemy.Position;
         Position newPosition;
 
-        if (pos.x + moveDirection[dir].x == width - 1 + groundCells || pos.x + moveDirection[dir].x == 0 + groundCells ||
-            pos.y + moveDirection[dir].y == height - 1 + groundCells || pos.y + moveDirection[dir].y == 0 + groundCells ||
+        if (gameField[pos.x + moveDirection[dir].x, pos.y + moveDirection[dir].y] == (int)Items.Ground ||
             gameField[pos.x + moveDirection[dir].x, pos.y + moveDirection[dir].y] == (int)Items.Enemy)
         {
             ChangeDirection(enemy);
@@ -305,8 +329,8 @@ public class GameField : SerializedMonoBehaviour
         if (gameField[pos.x + moveDirection[dir].x, pos.y + moveDirection[dir].y] == (int)Items.Tail ||
             gameField[pos.x + moveDirection[dir].x, pos.y + moveDirection[dir].y] == (int)Items.Player && isCutting)
         {
-            if (moveRoutine != null)
-                StopCoroutine(moveRoutine);
+            if (movePlayerRoutine != null)
+                StopCoroutine(movePlayerRoutine);
 
             DecreaseLife();
         }
@@ -325,7 +349,6 @@ public class GameField : SerializedMonoBehaviour
     private void ChangeDirection(Enemy enemy)
     {
         int index = enemy.DirectionIndex;
-
         var pos = enemy.Position;
 
         if (index == 0)
@@ -411,8 +434,8 @@ public class GameField : SerializedMonoBehaviour
             managerUI.ShowGameOverPanel();
         }
 
-        if (moveRoutine != null)
-            StopCoroutine(moveRoutine);
+        if (movePlayerRoutine != null)
+            StopCoroutine(movePlayerRoutine);
 
         ClearTail();
         SetPlayerStartPosition();
@@ -431,9 +454,9 @@ public class GameField : SerializedMonoBehaviour
 
     private void SetPlayerStartPosition()
     {
-        if (moveRoutine != null)
+        if (movePlayerRoutine != null)
         {
-            StopCoroutine(moveRoutine);
+            StopCoroutine(movePlayerRoutine);
         }
 
         if (isCutting)
