@@ -4,14 +4,17 @@ public class EnemiesGenerator : MonoBehaviour
 {
     [SerializeField] private GameField gameField;
     [SerializeField] private BoundConverter boundConverter;
-    [SerializeField] private int enemiesCount;
+
+    private int enemiesCount = 1;
 
     private int border;
     private int x;
     private int y;
 
-    public void GenerateEnemy()
+    public void GenerateEnemy(int addEnemies)
     {
+        enemiesCount += addEnemies;
+
         Vector3Int topLeftCorner = boundConverter.GetTopLeftCornerPosition();
         Vector3Int bottomRightCorner = boundConverter.GetBottomRightCornerPosition();
         

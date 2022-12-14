@@ -8,20 +8,20 @@ public class GeneratorManager : MonoBehaviour
     [SerializeField] private GameField gameField;
     [SerializeField] private PlayerMover playerMover;
 
-    public void Init(int lives)
+    public void Init(int addLives, int addEnemies)
     {
-        gameField.Init(lives);
+        gameField.Init(addLives);
         tilesGenerator.SetGameFieldSize();
         tilesGenerator.GenerateGround();
         tilesGenerator.GenerateWater();
         playerGenerator.GeneratePlayer();
-        enemiesGenerator.GenerateEnemy();
+        enemiesGenerator.GenerateEnemy(addEnemies);
 
         playerMover.SetPlayerMoveState(true);
     }
 
     private void Start()
     {
-        Init(0);
+        Init(0, 0);
     }
 }
