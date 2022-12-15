@@ -573,6 +573,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   generatorManager: {fileID: 2144798299}
   swipeController: {fileID: 838865193}
+  playerMover: {fileID: 838865192}
   gameField: {fileID: 1775470725}
   lifeText: {fileID: 769635674}
   fieldPercentsText: {fileID: 1064998427}
@@ -1452,6 +1453,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMover: {fileID: 838865192}
   swipeLength: 10
+  canTouch: 0
 --- !u!1 &918800133
 GameObject:
   m_ObjectHideFlags: 0
@@ -2522,6 +2524,7 @@ MonoBehaviour:
       Data: 
   managerUI: {fileID: 409577287}
   swipeController: {fileID: 838865193}
+  playerMover: {fileID: 838865192}
   tilemap: {fileID: 414335913}
   targetPercents: 30
   life: 0

@@ -439,8 +439,8 @@ public class GameField : SerializedMonoBehaviour
     {
         if (currentPercents >= targetPercents)
         {
-            managerUI.ShowWinPanel();
             swipeController.SetCanTouchValue(false);
+            managerUI.ShowWinPanel();
             StopAllCoroutines();
         }
     }
@@ -450,6 +450,7 @@ public class GameField : SerializedMonoBehaviour
         isLosingLife = true;
         life--;
         managerUI.UpdateLifeText(life);
+        lastPlayerDirection = new Position(0, 0);
 
         if (life <= 0)
         {
