@@ -453,6 +453,8 @@ public class GameField : SerializedMonoBehaviour
 
         if (life <= 0)
         {
+            life = 0;
+            managerUI.UpdateLifeText(life);
             playerMover.SetPlayerMoveState(false);
             managerUI.ShowGameOverPanel();
         }

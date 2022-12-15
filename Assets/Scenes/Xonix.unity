@@ -1402,6 +1402,7 @@ GameObject:
   m_Component:
   - component: {fileID: 838865191}
   - component: {fileID: 838865192}
+  - component: {fileID: 838865193}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1438,6 +1439,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameField: {fileID: 1775470725}
   isMoveActive: 0
+--- !u!114 &838865193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838865190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5adc122d4304ef4fa0dd0c0afe6a048, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMover: {fileID: 838865192}
 --- !u!1 &918800133
 GameObject:
   m_ObjectHideFlags: 0
@@ -1474,7 +1488,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &918800135
@@ -2509,7 +2523,7 @@ MonoBehaviour:
   managerUI: {fileID: 409577287}
   playerMover: {fileID: 838865192}
   tilemap: {fileID: 414335913}
-  targetPercents: 80
+  targetPercents: 60
   life: 0
 --- !u!1 &1849791464
 GameObject:

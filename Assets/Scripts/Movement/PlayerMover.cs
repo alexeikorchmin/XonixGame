@@ -10,27 +10,28 @@ public class PlayerMover : MonoBehaviour
         isMoveActive = isActive;
     }
 
-    private void Update()
+    public void PlayerSwipeMover(Swipes swipe)
     {
         if (!isMoveActive)
             return;
 
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        if (swipe == Swipes.None)
         {
-            gameField.MovePlayer(new Position(0, -1));
+            gameField.MovePlayer(new Position(0, 0));
         }
-
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        else if (swipe == Swipes.Up)
         {
             gameField.MovePlayer(new Position(0, 1));
         }
-
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (swipe == Swipes.Down)
+        {
+            gameField.MovePlayer(new Position(0, -1));
+        }
+        else if (swipe == Swipes.Left)
         {
             gameField.MovePlayer(new Position(-1, 0));
         }
-
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        else if (swipe == Swipes.Right)
         {
             gameField.MovePlayer(new Position(1, 0));
         }
