@@ -3,18 +3,9 @@ using UnityEngine;
 public class PlayerMover : MonoBehaviour
 {
     [SerializeField] private GameField gameField;
-    [SerializeField] private bool isMoveActive;
-
-    public void SetPlayerMoveState(bool isActive)
-    {
-        isMoveActive = isActive;
-    }
 
     public void PlayerSwipeMover(Swipes swipe)
     {
-        if (!isMoveActive)
-            return;
-
         if (swipe == Swipes.None)
         {
             gameField.MovePlayer(new Position(0, 0));

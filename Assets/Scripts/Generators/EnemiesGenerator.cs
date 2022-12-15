@@ -5,7 +5,7 @@ public class EnemiesGenerator : MonoBehaviour
     [SerializeField] private GameField gameField;
     [SerializeField] private BoundConverter boundConverter;
 
-    private int enemiesCount = 1;
+    [SerializeField] private int enemiesCount = 1;
 
     private int border;
     private int x;

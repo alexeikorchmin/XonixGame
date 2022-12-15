@@ -1,8 +1,10 @@
+using System.Collections;
 using UnityEngine;
 
 public class SwipeController : MonoBehaviour
 {
     [SerializeField] private PlayerMover playerMover;
+    [SerializeField] private float swipeLength = 10f;
 
     private Vector2 firstPressPos;
     private Vector2 secondPressPos;
@@ -12,17 +14,39 @@ public class SwipeController : MonoBehaviour
     private Swipes tempSwipeHorizontal;
     private Swipes tempSwipeVertical;
 
+    private Coroutine routine;
+    private bool canTouch;
+
+    public void SetCanTouchValue(bool newCanTouch)
+    {
+        if (routine != null)
+            StopCoroutine(routine);
+
+        if (newCanTouch == false)
+            canTouch = newCanTouch;
+        else
+            routine = StartCoroutine(BlockInputRoutine());
+    }
+
+    private IEnumerator BlockInputRoutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+        canTouch = true;
+    }
+
     private void Update()
     {
+        if (!canTouch)
+            return;
+
         CheckSwipeInput();
     }
 
     private void CheckSwipeInput()
     {
-        if (Input.touchCount > 0)
-        {       
+        if (Input.touches.Length > 0)
+        {
             Touch touch = Input.GetTouch(0);
-
             switch (touch.phase)
             {
                 case TouchPhase.Began:
@@ -32,7 +56,6 @@ public class SwipeController : MonoBehaviour
                 case TouchPhase.Ended:
                     {
                         secondPressPos = new Vector2(touch.position.x, touch.position.y);
-
                         if (firstPressPos.x < secondPressPos.x)
                         {
                             currentSwipe.x = secondPressPos.x - firstPressPos.x;
@@ -55,13 +78,27 @@ public class SwipeController : MonoBehaviour
                             tempSwipeVertical = Swipes.Down;
                         }
 
+                        float length;
+
                         if (currentSwipe.x > currentSwipe.y)
                         {
+                            length = currentSwipe.x;
                             swipeDirection = tempSwipeHorizontal;
                         }
                         else
                         {
+                            length = currentSwipe.y;
                             swipeDirection = tempSwipeVertical;
+                        }
+
+                        if (swipeDirection == tempSwipeHorizontal && length < Screen.width / swipeLength)
+                        {
+                            swipeDirection = Swipes.None;
+                        }
+
+                        if (swipeDirection == tempSwipeVertical && length < Screen.height / swipeLength)
+                        {
+                            swipeDirection = Swipes.None;
                         }
 
                         playerMover.PlayerSwipeMover(swipeDirection);

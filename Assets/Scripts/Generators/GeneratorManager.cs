@@ -6,7 +6,9 @@ public class GeneratorManager : MonoBehaviour
     [SerializeField] private PlayerGenerator playerGenerator;
     [SerializeField] private EnemiesGenerator enemiesGenerator;
     [SerializeField] private GameField gameField;
-    [SerializeField] private PlayerMover playerMover;
+    [SerializeField] private Grid grid;
+
+    private bool canSetGridSize;
 
     public void Init(int addLives, int addEnemies)
     {
@@ -16,12 +18,21 @@ public class GeneratorManager : MonoBehaviour
         tilesGenerator.GenerateWater();
         playerGenerator.GeneratePlayer();
         enemiesGenerator.GenerateEnemy(addEnemies);
-
-        playerMover.SetPlayerMoveState(true);
+        SetGridSize();
     }
 
     private void Start()
     {
         Init(0, 0);
+        canSetGridSize = true;
+    }
+
+    private void SetGridSize()
+    {
+        if (!canSetGridSize)
+            return;
+
+        grid.transform.localScale = new Vector3(0.9f, 0.9f, 1);
+        canSetGridSize = false;
     }
 }

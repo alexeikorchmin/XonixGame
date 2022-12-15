@@ -572,7 +572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   generatorManager: {fileID: 2144798299}
-  playerMover: {fileID: 838865192}
+  swipeController: {fileID: 838865193}
   gameField: {fileID: 1775470725}
   lifeText: {fileID: 769635674}
   fieldPercentsText: {fileID: 1064998427}
@@ -1404,7 +1404,7 @@ GameObject:
   - component: {fileID: 838865192}
   - component: {fileID: 838865193}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerMovement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1438,7 +1438,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameField: {fileID: 1775470725}
-  isMoveActive: 0
 --- !u!114 &838865193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1452,6 +1451,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerMover: {fileID: 838865192}
+  swipeLength: 10
 --- !u!1 &918800133
 GameObject:
   m_ObjectHideFlags: 0
@@ -1583,7 +1583,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.509434, g: 0.28373882, b: 0.07929869, a: 1}
+  m_Color: {r: 0.50980395, g: 0.078431375, b: 0.378843, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
@@ -2521,9 +2521,9 @@ MonoBehaviour:
       Entry: 8
       Data: 
   managerUI: {fileID: 409577287}
-  playerMover: {fileID: 838865192}
+  swipeController: {fileID: 838865193}
   tilemap: {fileID: 414335913}
-  targetPercents: 60
+  targetPercents: 30
   life: 0
 --- !u!1 &1849791464
 GameObject:
@@ -3517,7 +3517,7 @@ MonoBehaviour:
   playerGenerator: {fileID: 2144798298}
   enemiesGenerator: {fileID: 2144798300}
   gameField: {fileID: 1775470725}
-  playerMover: {fileID: 838865192}
+  grid: {fileID: 2145879712}
 --- !u!114 &2144798300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3532,6 +3532,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameField: {fileID: 1775470725}
   boundConverter: {fileID: 1155616016}
+  enemiesCount: 1
 --- !u!1 &2145879710
 GameObject:
   m_ObjectHideFlags: 0

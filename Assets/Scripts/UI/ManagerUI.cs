@@ -6,7 +6,7 @@ using TMPro;
 public class ManagerUI : MonoBehaviour
 {
     [SerializeField] private GeneratorManager generatorManager;
-    [SerializeField] private PlayerMover playerMover;
+    [SerializeField] private SwipeController swipeController;
     [SerializeField] private GameField gameField;
 
     [SerializeField] private TMP_Text lifeText;
@@ -56,7 +56,7 @@ public class ManagerUI : MonoBehaviour
         gameOverPanel.SetActive(false);
         winPanel.SetActive(false);
         pauseButton.gameObject.SetActive(true);
-        playerMover.SetPlayerMoveState(true);
+        swipeController.SetCanTouchValue(true);
         gameField.SetUnitsMoveState(true);
     }
 
@@ -65,7 +65,7 @@ public class ManagerUI : MonoBehaviour
         resumeButton.gameObject.SetActive(pauseGame);
         startGameButton.gameObject.SetActive(resumeGame);
         menuPanel.SetActive(pauseGame);
-        playerMover.SetPlayerMoveState(resumeGame);
+        swipeController.SetCanTouchValue(resumeGame);
         gameField.SetUnitsMoveState(resumeGame);
     }
 }

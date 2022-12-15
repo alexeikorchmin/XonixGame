@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 public class GameField : SerializedMonoBehaviour
 {
     [SerializeField] private ManagerUI managerUI;
-    [SerializeField] private PlayerMover playerMover;
+    [SerializeField] private SwipeController swipeController;
     [SerializeField] private Tilemap tilemap;
     [SerializeField] private Dictionary<Items, Tile> tilesDict = new Dictionary<Items, Tile>();
     [SerializeField] private int targetPercents;
@@ -440,7 +440,7 @@ public class GameField : SerializedMonoBehaviour
         if (currentPercents >= targetPercents)
         {
             managerUI.ShowWinPanel();
-            playerMover.SetPlayerMoveState(false);
+            swipeController.SetCanTouchValue(false);
             StopAllCoroutines();
         }
     }
@@ -455,7 +455,7 @@ public class GameField : SerializedMonoBehaviour
         {
             life = 0;
             managerUI.UpdateLifeText(life);
-            playerMover.SetPlayerMoveState(false);
+            swipeController.SetCanTouchValue(false);
             managerUI.ShowGameOverPanel();
         }
 
